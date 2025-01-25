@@ -1,15 +1,16 @@
 import express from 'express';
 import _ from 'lodash';
 import { Todos } from '../../data/todos.js';
-import { Users } from '../../data/users.js';
 import { auth } from '../../middlewares/auth.js';
+import { generateRandomId } from '../../utils/common.js';
 
 const router = express.Router();
 
 // 할일 전체 조회
 router.get('/', auth, (req, res) => {
   const userId = req.loginUserId;
-  const myTodos = Todos.filter((todo) => todo.userId === userId);
+  const validTodos = Todos.filter((todo) => !todo.isDeleted);
+  const myTodos = validTodos.filter((todo) => todo.userId === userId);
 
   res.json({
     isSuccess: true,
@@ -34,6 +35,11 @@ router.get('/:id', auth, (req, res) => {
 // 할일 작성
 router.post('/', auth, (req, res) => {
   const newTodo = req.body;
+  newTodo.id = generateRandomId();
+  newTodo.userId = req.loginUserId;
+  newTodo.isDone = false;
+  newTodo.createdAt = new Date();
+  newTodo.updatedAt = new Date();
   Todos.push(newTodo);
 
   res.json({
@@ -48,20 +54,24 @@ router.post('/', auth, (req, res) => {
 // 할일 수정
 router.put('/:id', auth, (req, res) => {
   const updatedTodo = req.body;
-  Todos.find((todo) => todo.id === req.params.id).content = updatedTodo.content;
+  const targetTodo = Todos.find((todo) => todo.id === req.params.id);
+  targetTodo.content = updatedTodo.content;
+  targetTodo.isDone = updatedTodo.isDone;
+  targetTodo.updatedAt = new Date();
 
   res.json({
     isSuccess: true,
     message: '할일 수정 성공',
     data: {
-      todo: updatedTodo,
+      todo: targetTodo,
     },
   });
 });
 
 // 할일 삭제
 router.delete('/:id', auth, (req, res) => {
-  Todos = Todos.filter((todo) => todo.id !== req.params.id);
+  const targetTodo = Todos.find((todo) => todo.id === req.params.id);
+  targetTodo.isDeleted = true;
 
   res.json({
     isSuccess: true,
