@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import routes from './routes/index.js';
 
 // Initialize express app
 const app = express();
@@ -11,9 +12,7 @@ app.use(cors());
 app.use(morgan('dev'));
 
 // Routes
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
+app.use('/', routes);
 
 // Start the server
 app.listen(PORT, () => {
