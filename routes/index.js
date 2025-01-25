@@ -1,11 +1,11 @@
 import express from 'express';
-import api from './api/index.js';
+import apiRoutes from './api/index.js';
 
 const router = express.Router();
 
-router.use('/api', api);
-router.get('/', (req, res) => {
-  res.send('React Basic Todo - API Server!');
+router.use('/api', apiRoutes);
+router.get('*', (req, res) => {
+  res.redirect('/api');
 });
 
 export default router;
