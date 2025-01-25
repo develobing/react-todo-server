@@ -5,7 +5,7 @@ import { auth } from '../../middlewares/auth.js';
 const router = express.Router();
 
 // 유저 전체 조회
-router.get('/', auth, (req, res) => {
+router.get('/', (req, res) => {
   res.json({
     isSuccess: true,
     message: '유저 전체 조회 성공',
